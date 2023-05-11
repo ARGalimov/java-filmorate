@@ -16,7 +16,7 @@ import java.util.Map;
 public class FilmController {
 
     private final Map<Integer, Film> films = new HashMap<>();
-    private Integer id = 0;
+    private Integer id = 0; 
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
