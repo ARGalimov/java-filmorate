@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ public class UserController {
     private Integer id = 0;
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) throws ValidationException {
+    public User create(@RequestBody User user) throws ValidationException {
         validateUser(user);
         validateUserCreation(users, user);
         user.setId(++id);
@@ -30,7 +29,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User user) throws ValidationException {
+    public User update(@RequestBody User user) throws ValidationException {
         validateUser(user);
         validateUserUpdate(users, user);
         users.put(user.getId(), user);
@@ -44,7 +43,7 @@ public class UserController {
         return new ArrayList<>(users.values());
     }
 
-    public static void validateUser(User user) throws ValidationException {
+    private void validateUser(User user) throws ValidationException {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.error("Электронная почта не может быть пустой и должна содержать символ @!");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @!");
@@ -57,20 +56,20 @@ public class UserController {
             log.warn("Имя для отображения может быть пустым — в таком случае будет использован логин!");
             user.setName(user.getLogin());
         }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
+        if (user.getBirthday() != null & user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Дата рождения не может быть в будущем!");
             throw new ValidationException("Дата рождения не может быть в будущем!");
         }
     }
 
-    public static void validateUserCreation(Map<Integer, User> users, User user) throws ValidationException {
+    private void validateUserCreation(Map<Integer, User> users, User user) throws ValidationException {
         if (users.containsKey(user.getId())) {
             log.error("Пользователь уже был добавлен!");
             throw new ValidationException("Пользователь уже был добавлен!");
         }
     }
 
-    public static void validateUserUpdate(Map<Integer, User> users, User user) throws ValidationException {
+    private void validateUserUpdate(Map<Integer, User> users, User user) throws ValidationException {
         if (!users.containsKey(user.getId())) {
             log.error("Пользователь не найден!");
             throw new ValidationException("Пользователь не найден!");
