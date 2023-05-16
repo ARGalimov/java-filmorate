@@ -49,15 +49,15 @@ public class FilmController {
             log.error("Название не может быть пустым!");
             throw new ValidationException("Название не может быть пустым!");
         }
-        if (film.getDescription() != null & film.getDescription().length() > 200) {
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
             log.error("Максимальная длина описания — 200 символов!");
             throw new ValidationException("Максимальная длина описания — 200 символов!");
         }
-        if (film.getReleaseDate() != null & film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
+        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
             log.error("Дата релиза — не раньше 28 декабря 1895 года!");
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года!");
         }
-        if (film.getDuration() != null & film.getDuration() <= 0) {
+        if (film.getDuration() != null && film.getDuration() <= 0) {
             log.error("Продолжительность фильма должна быть положительной!");
             throw new ValidationException("Продолжительность фильма должна быть положительной!");
         }
