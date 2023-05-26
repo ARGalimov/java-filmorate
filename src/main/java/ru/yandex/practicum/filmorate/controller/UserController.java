@@ -1,79 +1,75 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NoDataException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
+    private final UserService userService;
 
-    private final Map<Integer, User> users = new HashMap<>();
-    private Integer id = 0;
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
     public User create(@RequestBody User user) throws ValidationException {
-        validateUser(user);
-        validateUserCreation(users, user);
-        user.setId(++id);
-        users.put(user.getId(), user);
+        userService.create(user);
         log.info("Пользователь создан");
-        return users.get(user.getId());
+        return user;
     }
 
     @PutMapping
-    public User update(@RequestBody User user) throws ValidationException {
-        validateUser(user);
-        validateUserUpdate(users, user);
-        users.put(user.getId(), user);
+    public User update(@RequestBody User user) throws ValidationException, NoDataException {
+        userService.update(user);
         log.info("Пользователь обновлен");
-        return users.get(user.getId());
+        return user;
     }
 
     @GetMapping
     public List<User> findAll() {
         log.info("Список пользователей получен");
-        return new ArrayList<>(users.values());
+        return userService.findAll();
     }
 
-    private void validateUser(User user) throws ValidationException {
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.error("Электронная почта не может быть пустой и должна содержать символ @!");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @!");
-        }
-        if (user.getLogin() == null || user.getLogin().isBlank()) {
-            log.error("Логин не может быть пустым и содержать пробелы!");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы!");
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.warn("Имя для отображения может быть пустым — в таком случае будет использован логин!");
-            user.setName(user.getLogin());
-        }
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Дата рождения не может быть в будущем!");
-            throw new ValidationException("Дата рождения не может быть в будущем!");
-        }
+    @GetMapping("/{id}")
+    public User getById(@PathVariable(name = "id") Integer id) throws NoDataException {
+        return userService.getById(id);
     }
 
-    private void validateUserCreation(Map<Integer, User> users, User user) throws ValidationException {
-        if (users.containsKey(user.getId())) {
-            log.error("Пользователь уже был добавлен!");
-            throw new ValidationException("Пользователь уже был добавлен!");
-        }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable(name = "id") Integer id, @PathVariable(name = "friendId") Integer friendId)
+            throws NoDataException {
+        return userService.addFriend(id, friendId);
     }
 
-    private void validateUserUpdate(Map<Integer, User> users, User user) throws ValidationException {
-        if (!users.containsKey(user.getId())) {
-            log.error("Пользователь не найден!");
-            throw new ValidationException("Пользователь не найден!");
-        }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User deleteFriend(@PathVariable(name = "id") Integer id, @PathVariable(name = "friendId") Integer friendId)
+            throws NoDataException {
+        return userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable(name = "id") Integer id) throws NoDataException {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(
+            @PathVariable(name = "id") Integer id,
+            @PathVariable(name = "otherId") Integer otherId) throws NoDataException {
+        return userService.getCommonFriends(id, otherId);
     }
 }
 
