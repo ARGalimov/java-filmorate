@@ -22,7 +22,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void create(User user) throws ValidationException {
-        validateUser(user);
         validateUserCreation(users, user);
         user.setId(++id);
         users.put(user.getId(), user);
@@ -30,7 +29,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void update(User user) throws ValidationException, NoDataException {
-        validateUser(user);
         validateUserUpdate(users, user);
         users.put(user.getId(), user);
     }
@@ -68,13 +66,15 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     private void validateUserCreation(Map<Integer, User> users, User user) throws ValidationException {
+        validateUser(user);
         if (users.containsKey(user.getId())) {
             log.error("Пользователь уже был добавлен!");
             throw new ValidationException("Пользователь уже был добавлен!");
         }
     }
 
-    private void validateUserUpdate(Map<Integer, User> users, User user) throws NoDataException {
+    private void validateUserUpdate(Map<Integer, User> users, User user) throws NoDataException, ValidationException {
+        validateUser(user);
         if (!users.containsKey(user.getId())) {
             log.error("Пользователь не найден!");
             throw new NoDataException("Пользователь не найден!");

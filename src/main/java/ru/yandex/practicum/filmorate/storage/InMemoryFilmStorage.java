@@ -21,7 +21,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void create(Film film) throws ValidationException {
-        validateFilm(film);
         validateFilmCreation(films, film);
         film.setId(++id);
         films.put(film.getId(), film);
@@ -29,7 +28,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void update(Film film) throws ValidationException, NoDataException {
-        validateFilm(film);
         validateFilmUpdate(films, film);
         films.put(film.getId(), film);
     }
@@ -41,24 +39,28 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getById(Integer id) throws NoDataException {
-        if(!films.containsKey(id)) {
+        if (!films.containsKey(id)) {
             throw new NoDataException("Фильм не существует");
         }
         return films.get(id);
     }
+
     private void validateFilm(Film film) throws ValidationException {
         if (film.getName() == null || film.getName().isBlank()) {
             log.error("Название не может быть пустым!");
             throw new ValidationException("Название не может быть пустым!");
         }
+
         if (film.getDescription() != null && film.getDescription().length() > 200) {
             log.error("Максимальная длина описания — 200 символов!");
             throw new ValidationException("Максимальная длина описания — 200 символов!");
         }
+
         if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
             log.error("Дата релиза — не раньше 28 декабря 1895 года!");
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года!");
         }
+
         if (film.getDuration() != null && film.getDuration() <= 0) {
             log.error("Продолжительность фильма должна быть положительной!");
             throw new ValidationException("Продолжительность фильма должна быть положительной!");
@@ -66,13 +68,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     private void validateFilmCreation(Map<Integer, Film> films, Film film) throws ValidationException {
+        validateFilm(film);
         if (films.containsKey(film.getId())) {
             log.error("Фильм уже был добавлен!");
             throw new ValidationException("Фильм уже был добавлен!");
         }
-   }
+    }
 
-    private void validateFilmUpdate(Map<Integer, Film> films, Film film) throws NoDataException {
+    private void validateFilmUpdate(Map<Integer, Film> films, Film film) throws NoDataException, ValidationException {
+        validateFilm(film);
         if (!films.containsKey(film.getId())) {
             log.error("Фильм не найден!");
             throw new NoDataException("Фильм не найден!");

@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,18 +78,13 @@ public class UserService {
     public List<User> getCommonFriends(Integer id, Integer otherId) throws NoDataException {
         User userById = userStorage.getById(id);
         User otherUserById = userStorage.getById(otherId);
-        List<Integer> commonFriends = userStorage.getUserList()
-                .stream()
-                .filter(user -> user.getId().equals(userById.getId()))
-                .findFirst()
-                .orElseThrow()
-                .getFriends()
-                .stream()
-                .filter(streamId -> otherUserById.getFriends().contains(streamId))
-                .collect(Collectors.toList());
-        List<User> userList = userStorage.getUserList();
-        return userList.stream()
-                .filter(user -> commonFriends.contains(user.getId()))
-                .collect(Collectors.toList());
+        List<User> commonFriends = new ArrayList<>();
+
+        for (Integer friendId : userById.getFriends()) {
+            if (otherUserById.getFriends().contains(friendId)) {
+                commonFriends.add(getById(friendId));
+            }
+        }
+        return commonFriends;
     }
 }
