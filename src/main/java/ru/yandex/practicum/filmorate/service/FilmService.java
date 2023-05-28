@@ -48,7 +48,7 @@ public class FilmService {
     public Film deleteLike(Integer id, Integer userId) throws NoDataException {
         Film film = filmStorage.getById(id);
         Set<Integer> likes = film.getLikes();
-        if(!likes.contains(userId)) {
+        if (!likes.contains(userId)) {
             throw new NoDataException("Пользователь не найден");
         }
         likes.remove(userId);
@@ -57,7 +57,7 @@ public class FilmService {
 
     public List<Film> getPopular(Integer count) {
         List<Film> popular = filmStorage.getFilmList();
-        if(popular.size() <=1 ) {
+        if (popular.size() <= 1) {
             return popular;
         } else {
             return popular.stream()
