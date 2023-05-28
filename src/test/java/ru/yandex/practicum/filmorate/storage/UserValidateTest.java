@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.NoDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -88,7 +89,7 @@ public class UserValidateTest {
     void validateUserUpdate() {
         User user = new User("example@mail.ru", "Login", "Name", LocalDate.of(2023, 1, 1));
         user.setId(1);
-        ValidationException exception = assertThrows(ValidationException.class,
+        NoDataException exception = assertThrows(NoDataException.class,
                 () -> inMemoryUserStorage.update(user));
         assertEquals("Пользователь не найден!", exception.getMessage());
     }

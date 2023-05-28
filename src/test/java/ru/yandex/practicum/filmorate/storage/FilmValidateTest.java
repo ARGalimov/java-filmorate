@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.NoDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -83,8 +84,8 @@ public class FilmValidateTest {
     void testFilmIsNotCreatedBefore() {
         Film film = new Film("Фильм", "Первый фильм", LocalDate.of(2023, 1, 1), 90);
         film.setId(1);
-        ValidationException exception = assertThrows(
-                ValidationException.class,
+        NoDataException exception = assertThrows(
+                NoDataException.class,
                 () -> inMemoryFilmStorage.update(film)
         );
         assertEquals("Фильм не найден!", exception.getMessage());
