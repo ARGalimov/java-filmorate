@@ -52,9 +52,7 @@
    JOIN friends AS f ON u.id = f.id_user
   
    JOIN users AS uf ON f.id_friend = uf.id
-  
-   JOIN friends AS appr ON f.id_user = appr.id_friend
-   
-                       AND f.id_friend = appr.id_user
                       
-   WHERE u.name = 'Иван';
+   WHERE u.name = 'Иван'
+   
+     AND f.status = true;
