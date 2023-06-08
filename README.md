@@ -3,7 +3,7 @@
 
 [Схема БД к проекту Filmorate.](https://dbdiagram.io/d/647e2d0f722eb774946f1251)
 
-![DbSchema](./src/main/resources/DbSchema.jpg)
+![DBSchema](./src/main/resources/DBSchema.jpg)
 
 Примеры запросов для основных операций:
 1) Получить все фильмы без возрастных ограничений
