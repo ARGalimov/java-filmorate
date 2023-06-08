@@ -55,4 +55,4 @@
                       
    WHERE u.name = 'Иван'
    
-     AND f.status = true;
+     AND f.is_approve = true;
