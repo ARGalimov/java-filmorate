@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NoDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -20,18 +22,29 @@ public class InMemoryFilmStorage implements FilmStorage {
     private Integer id = 0;
 
     @Override
-    public void create(Film film) throws ValidationException {
+    public Film create(Film film) throws ValidationException {
         validateFilmCreation(films, film);
         film.setId(++id);
         films.put(film.getId(), film);
+        return film;
     }
 
     @Override
-    public void update(Film film) throws ValidationException, NoDataException {
+    public Film update(Film film) throws ValidationException, NoDataException {
         validateFilmUpdate(films, film);
         films.put(film.getId(), film);
+        return film;
     }
 
+    @Override
+    public void delete(Film film) {
+        if (films.containsKey(film.getId())) {
+            films.remove(film.getId());
+            log.debug("Фильм {} удалён", film);
+        } else {
+            throw new NoDataException("Фильм не существует");
+        }
+    }
     @Override
     public List<Film> getFilmList() {
         return new ArrayList<>(films.values());
@@ -81,5 +94,48 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Фильм не найден!");
             throw new NoDataException("Фильм не найден!");
         }
+    }
+    @Override
+    public List<Genre> getAllGenres() {
+        List<Film> films = getFilmList();
+        List<Genre> genres = new ArrayList<>();
+        for (Film film : films) {
+            genres.addAll(film.getGenres());
+        }
+        return genres;
+    }
+
+    @Override
+    public Genre getGenreById(Integer id) {
+        List<Film> films = getFilmList();
+        for (Film film : films) {
+            for (Genre genre : film.getGenres()) {
+                if (genre.getId() == id.intValue()) {
+                    return genre;
+                }
+            }
+        }
+        throw new NoDataException("Нет рейтинга с таким id");
+    }
+
+    @Override
+    public List<MPA> getAllRatings() {
+        List<Film> films = getFilmList();
+        List<MPA> mpas = new ArrayList<>();
+        for (Film film : films) {
+            mpas.add(film.getMpa());
+        }
+        return mpas;
+    }
+
+    @Override
+    public MPA getRatingById(Integer id) {
+        List<Film> films = getFilmList();
+        for (Film film : films) {
+            if (film.getMpa().getId() == id.intValue()) {
+                return film.getMpa();
+            }
+        }
+        throw new NoDataException("Нет рейтинга с таким id");
     }
 }

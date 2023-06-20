@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -21,16 +18,28 @@ public class InMemoryUserStorage implements UserStorage {
     private Integer id = 0;
 
     @Override
-    public void create(User user) throws ValidationException {
+    public User create(User user) throws ValidationException {
         validateUserCreation(users, user);
         user.setId(++id);
         users.put(user.getId(), user);
+        return user;
     }
 
     @Override
-    public void update(User user) throws ValidationException, NoDataException {
+    public User update(User user) throws ValidationException, NoDataException {
         validateUserUpdate(users, user);
         users.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
+    public void delete(User user) {
+        if (users.containsKey(user.getId())) {
+            users.remove(user.getId());
+            log.debug("Пользователь {} удалён", user);
+        } else {
+            throw new NoDataException("Пользователь не найден");
+        }
     }
 
     @Override

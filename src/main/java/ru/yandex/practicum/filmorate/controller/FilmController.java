@@ -7,12 +7,14 @@ import ru.yandex.practicum.filmorate.exception.NoDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.util.List;
 
 @RestController
 @Slf4j
-@RequestMapping("/films")
+@RequestMapping
 public class FilmController {
     private final FilmService filmService;
 
@@ -21,45 +23,72 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @PostMapping
+    @PostMapping("/films")
     public Film create(@RequestBody Film film) throws ValidationException {
         filmService.create(film);
         log.info("Фильм создан");
         return film;
     }
 
-    @PutMapping
+    @PutMapping("/films")
     public Film update(@RequestBody Film film) throws ValidationException, NoDataException {
         filmService.update(film);
         log.info("Фильм обновлен");
         return film;
     }
 
-    @GetMapping
+    @GetMapping("/films")
     public List<Film> findAll() {
         log.info("Список фильмов получен");
         return filmService.findAll();
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping("/films/{id}/like/{userId}")
     public Film addLike(@PathVariable(name = "id") Integer id, @PathVariable(name = "userId") Integer userId)
             throws NoDataException {
         return filmService.addLike(id, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping("/films/{id}/like/{userId}")
     public Film deleteLike(@PathVariable(name = "id") Integer id, @PathVariable(name = "userId") Integer userId)
             throws NoDataException {
         return filmService.deleteLike(id, userId);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/films/{id}")
     public Film getById(@PathVariable(name = "id") Integer id) throws NoDataException {
         return filmService.getById(id);
     }
 
-    @GetMapping("/popular")
+    @GetMapping("/films/popular")
     public List<Film> getPopular(@RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
         return filmService.getPopular(count);
     }
-}
+
+    @GetMapping("/genres")
+    public List<Genre> findAllGenres() {
+        List<Genre> genres = filmService.getAllGenres();
+        log.info("Genres are returned: {}", genres);
+        return genres;
+    }
+
+    @GetMapping("/genres/{id}")
+    public Genre findGenreById(@PathVariable(name="id") Integer id) throws NoDataException {
+        Genre genre = filmService.getGenreById(id);
+        log.info(String.format("Genre with id %s is returned: {}", id), genre);
+        return genre;
+    }
+
+    @GetMapping("/rating")
+    public List<MPA> findAllRatings() {
+        List<MPA> mpa = filmService.getAllRatings();
+        log.info("Ratings are returned: {}", mpa);
+        return mpa;
+    }
+
+    @GetMapping("/rating/{id}")
+    public MPA findRatingById(@PathVariable(name="id") Integer id) throws NoDataException {
+        MPA mpa = filmService.getRatingById(id);
+        log.info(String.format("MPA with id %s is returned: {}", id), mpa);
+        return mpa;
+    }}

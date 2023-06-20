@@ -8,12 +8,13 @@ import java.util.List;
 
 public interface UserStorage {
 
-    void create(User user) throws ValidationException;
+    User create(User user) throws ValidationException;
 
-    void update(User user) throws ValidationException, NoDataException;
+    User update(User user) throws ValidationException, NoDataException;
+
+    void delete(User user);
 
     List<User> getUserList();
 
     User getById(Integer id) throws NoDataException;
-
 }

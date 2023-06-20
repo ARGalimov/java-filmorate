@@ -1,11 +1,14 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.util.List;
 import java.util.Set;
@@ -16,7 +19,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 
@@ -69,5 +72,21 @@ public class FilmService {
                     .limit(count)
                     .collect(Collectors.toList());
         }
+    }
+
+    public List<Genre> getAllGenres() {
+        return filmStorage.getAllGenres();
+    }
+
+    public Genre getGenreById(Integer id) {
+        return filmStorage.getGenreById(id);
+    }
+
+    public List<MPA> getAllRatings() {
+        return filmStorage.getAllRatings();
+    }
+
+    public MPA getRatingById(Integer id) {
+        return filmStorage.getRatingById(id);
     }
 }

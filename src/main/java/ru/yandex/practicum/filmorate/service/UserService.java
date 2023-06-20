@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -9,7 +10,8 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -17,7 +19,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -39,50 +41,47 @@ public class UserService {
         return userStorage.getById(id);
     }
 
-    public User addFriend(Integer id, Integer friendId) throws NoDataException {
-        User userById = userStorage.getById(id);
-        User friendById = userStorage.getById(friendId);
-        userStorage.getUserList()
-                .stream()
-                .filter(user -> user.getId().equals(userById.getId()))
-                .forEach(user -> user.getFriends().add(friendById.getId()));
-        userStorage.getUserList()
-                .stream()
-                .filter(user -> user.getId().equals(friendById.getId()))
-                .forEach(user -> user.getFriends().add(userById.getId()));
-        return userById;
+    public void addFriend(Integer userId, Integer friendId) {
+        User user = userStorage.getById(userId);
+        userStorage.getById(friendId);
+        Map<Integer, Boolean> userFriends = user.getFriends();
+
+        userFriends.put(friendId, false);
+        user.setFriends(userFriends);
+        userStorage.update(user);
     }
 
-    public User deleteFriend(Integer id, Integer friendId) throws NoDataException {
-        User userById = userStorage.getById(id);
-        User friendById = userStorage.getById(friendId);
-        userStorage.getUserList()
-                .stream()
-                .filter(user -> user.getFriends().contains(userById.getId()))
-                .forEach(user -> user.getFriends().remove(friendById.getId()));
-        userStorage.getUserList()
-                .stream()
-                .filter(user -> user.getFriends().contains(friendById.getId()))
-                .forEach(user -> user.getFriends().remove(userById.getId()));
-        return userById;
+    public void deleteFriend(Integer userId, Integer friendId) throws NoDataException {
+        User user = userStorage.getById(userId);
+        Map<Integer, Boolean> userFriends = user.getFriends();
+        userFriends.remove(friendId);
+        user.setFriends(userFriends);
+        userStorage.update(user);
     }
 
-    public List<User> getFriends(Integer id) throws NoDataException {
-        User userById = userStorage.getById(id);
-        return userStorage.getUserList()
-                .stream()
-                .filter(user -> user.getFriends().contains(id))
-                .collect(Collectors.toList());
+    public List<User> getFriends(Map<Integer, Boolean> ids) throws NoDataException {
+        List<User> friends = new ArrayList<>();
+        for (Map.Entry<Integer, Boolean> entry : ids.entrySet()) {
+            friends.add(userStorage.getById(entry.getKey()));
+        }
+        return friends;
     }
 
-    public List<User> getCommonFriends(Integer id, Integer otherId) throws NoDataException {
-        User userById = userStorage.getById(id);
-        User otherUserById = userStorage.getById(otherId);
+    public List<User> getCommonFriends(Integer userId, Integer otherId) throws NoDataException {
+        Map<Integer, Boolean> userFriendsIds = userStorage.getById(userId).getFriends();
+        Map<Integer, Boolean> otherIdFriendsIds = userStorage.getById(otherId).getFriends();
+        if (Objects.nonNull(userFriendsIds) && Objects.nonNull(otherIdFriendsIds)) {
+            return addCommonFriends(userFriendsIds, otherIdFriendsIds);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<User> addCommonFriends
+            (Map<Integer, Boolean> userFriendsIds, Map<Integer, Boolean> otherIdFriendsIds) {
         List<User> commonFriends = new ArrayList<>();
-
-        for (Integer friendId : userById.getFriends()) {
-            if (otherUserById.getFriends().contains(friendId)) {
-                commonFriends.add(getById(friendId));
+        for (Map.Entry<Integer, Boolean> entry : userFriendsIds.entrySet()) {
+            if (otherIdFriendsIds.containsKey(entry.getKey())) {
+                commonFriends.add(userStorage.getById(entry.getKey()));
             }
         }
         return commonFriends;
