@@ -73,7 +73,7 @@ public class FilmController {
     }
 
     @GetMapping("/genres/{id}")
-    public Genre findGenreById(@PathVariable(name="id") Integer id) throws NoDataException {
+    public Genre findGenreById(@PathVariable(name = "id") Integer id) throws NoDataException {
         Genre genre = filmService.getGenreById(id);
         log.info(String.format("Genre with id %s is returned: {}", id), genre);
         return genre;
@@ -87,8 +87,9 @@ public class FilmController {
     }
 
     @GetMapping("/rating/{id}")
-    public MPA findRatingById(@PathVariable(name="id") Integer id) throws NoDataException {
+    public MPA findRatingById(@PathVariable(name = "id") Integer id) throws NoDataException {
         MPA mpa = filmService.getRatingById(id);
         log.info(String.format("MPA with id %s is returned: {}", id), mpa);
         return mpa;
-    }}
+    }
+}
