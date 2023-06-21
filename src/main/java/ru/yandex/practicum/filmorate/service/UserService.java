@@ -76,8 +76,7 @@ public class UserService {
         return new ArrayList<>();
     }
 
-    private List<User> addCommonFriends
-            (Map<Integer, Boolean> userFriendsIds, Map<Integer, Boolean> otherIdFriendsIds) {
+    private List<User> addCommonFriends(Map<Integer, Boolean> userFriendsIds, Map<Integer, Boolean> otherIdFriendsIds) {
         List<User> commonFriends = new ArrayList<>();
         for (Map.Entry<Integer, Boolean> entry : userFriendsIds.entrySet()) {
             if (otherIdFriendsIds.containsKey(entry.getKey())) {
