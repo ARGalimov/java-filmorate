@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @lombok.Data
+@lombok.NoArgsConstructor
 public class Film {
     private Integer id;
     private String name;
@@ -14,10 +15,8 @@ public class Film {
     private MPA mpa;
     private List<Genre> genres = new ArrayList<>();
 
-    public Film() {
-    }
-
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Set<Integer> likes, List<Genre> genres, MPA mpa) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

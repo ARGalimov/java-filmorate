@@ -11,12 +11,14 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NoDataException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.sql.PreparedStatement;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 
 @Component
@@ -34,6 +36,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
+        validateFilm(film);
         String sqlQuery = "INSERT INTO FILMS (NAME, DESCRIPTION, RELEASE_DATE, DURATION, ID_RATING) " +
                 "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -90,9 +93,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getById(Integer id) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILMS WHERE ID = ?", id);
-        if (userRows.next()) {
-            Film film = makeFilm(userRows);
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILMS WHERE ID = ?", id);
+        if (filmRows.next()) {
+            Film film = makeFilm(filmRows);
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
             return film;
         } else {
@@ -170,7 +173,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void deleteFromFilmLikes(Film film) {
-        String sqlQuery = "DELETE FROM FILM_LIKES WHERE ID = ?";
+        String sqlQuery = "DELETE FROM FILM_LIKES WHERE ID_FILM = ?";
         jdbcTemplate.update(sqlQuery, film.getId());
     }
 
@@ -206,7 +209,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Set<Integer> getLikes(Integer filmId) {
-        String sql = "SELECT USER_ID FROM FILM_LIKES WHERE ID = ?";
+        String sql = "SELECT ID_USER FROM FILM_LIKES WHERE ID_FILM = ?";
         List<Integer> likes = jdbcTemplate.queryForList(sql, Integer.class, filmId);
         return new HashSet<>(likes);
     }
@@ -237,5 +240,25 @@ public class FilmDbStorage implements FilmStorage {
         return genreIdList;
     }
 
+    private void validateFilm(Film film) throws ValidationException {
+        if (film.getName() == null || film.getName().isBlank()) {
+            log.error("Название не может быть пустым!");
+            throw new ValidationException("Название не может быть пустым!");
+        }
 
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
+            log.error("Максимальная длина описания — 200 символов!");
+            throw new ValidationException("Максимальная длина описания — 200 символов!");
+        }
+
+        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
+            log.error("Дата релиза — не раньше 28 декабря 1895 года!");
+            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года!");
+        }
+
+        if (film.getDuration() != null && film.getDuration() <= 0) {
+            log.error("Продолжительность фильма должна быть положительной!");
+            throw new ValidationException("Продолжительность фильма должна быть положительной!");
+        }
+    }
 }

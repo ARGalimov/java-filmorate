@@ -23,16 +23,12 @@ public class UserController {
 
     @PostMapping
     public User create(@RequestBody User user) throws ValidationException {
-        userService.create(user);
-        log.info("Пользователь создан");
-        return user;
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody User user) throws ValidationException, NoDataException {
-        userService.update(user);
-        log.info("Пользователь обновлен");
-        return user;
+        return userService.update(user);
     }
 
     @GetMapping

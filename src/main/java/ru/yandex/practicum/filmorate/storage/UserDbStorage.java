@@ -9,7 +9,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exception.NoDataException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
@@ -31,7 +33,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        user.setName(checkAndReturnName(user));
+        validateUser(user);
         String sqlQuery = "INSERT INTO USERS (EMAIL, LOGIN, NAME, BIRTHDAY) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -104,7 +106,7 @@ public class UserDbStorage implements UserStorage {
 
     private void updateFriends(User user) {
         deleteFromFriends(user);
-        String sqlQuery = "INSERT INTO FRIENDS (FRIEND_1, FRIEND_2, CONFIRMATION) VALUES (?, ?, ?)";
+        String sqlQuery = "INSERT INTO FRIENDS (ID_USER, ID_FRIEND, IS_APPROVE) VALUES (?, ?, ?)";
         for (Map.Entry<Integer, Boolean> entry : user.getFriends().entrySet()) {
             jdbcTemplate.update(sqlQuery, user.getId(), entry.getKey(), entry.getValue());
         }
@@ -142,11 +144,22 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sqlQuery, user.getId());
     }
 
-    private String checkAndReturnName(User user) {
-        if (Objects.isNull(user.getName()) || user.getName().isBlank()) {
-            return user.getLogin();
-        } else {
-            return user.getName();
+    private void validateUser(User user) throws ValidationException {
+        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+            log.error("Электронная почта не может быть пустой и должна содержать символ @!");
+            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @!");
+        }
+        if (user.getLogin() == null || user.getLogin().isBlank() || StringUtils.containsWhitespace(user.getLogin())) {
+            log.error("Логин не может быть пустым и содержать пробелы!");
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы!");
+        }
+        if (user.getName() == null || user.getName().isBlank()) {
+            log.warn("Имя для отображения может быть пустым — в таком случае будет использован логин!");
+            user.setName(user.getLogin());
+        }
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
+            log.error("Дата рождения не может быть в будущем!");
+            throw new ValidationException("Дата рождения не может быть в будущем!");
         }
     }
 }

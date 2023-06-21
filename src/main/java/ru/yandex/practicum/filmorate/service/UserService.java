@@ -24,13 +24,11 @@ public class UserService {
     }
 
     public User create(User user) throws ValidationException {
-        userStorage.create(user);
-        return user;
+        return userStorage.create(user);
     }
 
     public User update(User user) throws ValidationException, NoDataException {
-        userStorage.update(user);
-        return user;
+        return userStorage.update(user);
     }
 
     public List<User> findAll() {
