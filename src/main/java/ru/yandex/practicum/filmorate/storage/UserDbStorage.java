@@ -119,8 +119,8 @@ public class UserDbStorage implements UserStorage {
         HashMap<Integer, Boolean> friends = new HashMap<>();
         while (rs.next()) {
             Integer userId = rs.getInt(1);
-            Boolean IS_APPROVE = rs.getBoolean(2);
-            friends.put(userId, IS_APPROVE);
+            Boolean isApprove = rs.getBoolean(2);
+            friends.put(userId, isApprove);
         }
         return friends;
     }
