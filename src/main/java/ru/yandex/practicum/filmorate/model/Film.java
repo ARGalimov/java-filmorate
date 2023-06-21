@@ -14,7 +14,8 @@ public class Film {
     private MPA mpa;
     private List<Genre> genres = new ArrayList<>();
 
-    public Film() { }
+    public Film() {
+    }
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Set<Integer> likes, List<Genre> genres, MPA mpa) {
         this.name = name;
