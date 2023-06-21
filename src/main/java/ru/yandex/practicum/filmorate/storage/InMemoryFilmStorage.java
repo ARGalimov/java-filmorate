@@ -45,6 +45,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NoDataException("Фильм не существует");
         }
     }
+
     @Override
     public List<Film> getFilmList() {
         return new ArrayList<>(films.values());
@@ -95,6 +96,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NoDataException("Фильм не найден!");
         }
     }
+
     @Override
     public List<Genre> getAllGenres() {
         List<Film> films = getFilmList();

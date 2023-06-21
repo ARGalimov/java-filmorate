@@ -89,5 +89,4 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NoDataException("Пользователь не найден!");
         }
     }
-
 }
