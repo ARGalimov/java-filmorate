@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -11,12 +12,13 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NoDataException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.util.*;
 
 @Component
+@Qualifier("UserDbStorage")
 public class UserDbStorage implements UserStorage {
     private final Logger log = LoggerFactory.getLogger(UserDbStorage.class);
 

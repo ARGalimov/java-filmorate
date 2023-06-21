@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @lombok.Data
+@lombok.NoArgsConstructor
 public class User {
     private Integer id;
     private String email;
@@ -12,9 +13,6 @@ public class User {
     private String name;
     private LocalDate birthday;
     private Map<Integer, Boolean> friends = new HashMap<>();
-
-    public User() {
-    }
 
     public User(Integer id, String email, String login, String name, LocalDate birthday, Map<Integer, Boolean> friends) {
         this.id = id;

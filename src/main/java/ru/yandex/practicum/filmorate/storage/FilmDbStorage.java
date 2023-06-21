@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.storage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Component
+@Qualifier("FilmDbStorage")
 public class FilmDbStorage implements FilmStorage {
 
     private final Logger log = LoggerFactory.getLogger(UserDbStorage.class);
