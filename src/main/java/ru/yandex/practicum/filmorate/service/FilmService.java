@@ -6,7 +6,11 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.MPAStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,10 +19,16 @@ import java.util.stream.Collectors;
 public class FilmService {
     private static final Integer MAX_QUANTITY_POPULAR_FILMS = 10;
     private final FilmStorage filmStorage;
+    private final GenreStorage genreStorage;
+    private final MPAStorage mPAStorage;
 
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
+                       @Qualifier("GenreDbStorage") GenreStorage genreStorage,
+                       @Qualifier("MPADbStorage") MPAStorage mPAStorage) {
         this.filmStorage = filmStorage;
+        this.genreStorage = genreStorage;
+        this.mPAStorage = mPAStorage;
     }
 
     public Film create(Film film) throws ValidationException {
@@ -70,5 +80,21 @@ public class FilmService {
             count = MAX_QUANTITY_POPULAR_FILMS;
         }
         return popularFilms.stream().limit(count).collect(Collectors.toSet());
+    }
+
+    public List<Genre> getAllGenres() {
+        return genreStorage.getAllGenres();
+    }
+
+    public Genre getGenreById(Integer id) {
+        return genreStorage.getGenreById(id);
+    }
+
+    public List<MPA> getAllRatings() {
+        return mPAStorage.getAllRatings();
+    }
+
+    public MPA getRatingById(Integer id) {
+        return mPAStorage.getRatingById(id);
     }
 }
