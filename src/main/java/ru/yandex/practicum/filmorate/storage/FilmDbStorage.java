@@ -25,7 +25,7 @@ import java.util.*;
 @Qualifier("FilmDbStorage")
 public class FilmDbStorage implements FilmStorage {
 
-    private final Logger log = LoggerFactory.getLogger(UserDbStorage.class);
+    private final Logger log = LoggerFactory.getLogger(FilmDbStorage.class);
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -104,47 +104,6 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    @Override
-    public List<Genre> getAllGenres() {
-        List<Genre> filmGenres = new ArrayList<>();
-        SqlRowSet genreRows = jdbcTemplate.queryForRowSet("SELECT * FROM GENRE ORDER BY ID");
-        while (genreRows.next()) {
-            Genre genre = makeGenre(genreRows);
-            filmGenres.add(genre);
-        }
-        return filmGenres;
-    }
-
-    @Override
-    public Genre getGenreById(Integer id) {
-        SqlRowSet genreRows =
-                jdbcTemplate.queryForRowSet("SELECT * FROM GENRE WHERE ID = ? ORDER BY ID", id);
-        if (genreRows.next()) {
-            return makeGenre(genreRows);
-        } else
-            throw new NoDataException("Не найден жанр с таким номером");
-    }
-
-    @Override
-    public List<MPA> getAllRatings() {
-        List<MPA> filmRatings = new ArrayList<>();
-        SqlRowSet ratingRows = jdbcTemplate.queryForRowSet("SELECT * FROM RATING ORDER BY ID");
-        while (ratingRows.next()) {
-            MPA mpa = makeMPA(ratingRows);
-            filmRatings.add(mpa);
-        }
-        return filmRatings;
-    }
-
-    @Override
-    public MPA getRatingById(Integer id) {
-        SqlRowSet ratingRows = jdbcTemplate.queryForRowSet("SELECT * FROM RATING WHERE ID = ?", id);
-        if (ratingRows.next()) {
-            return makeMPA(ratingRows);
-        } else
-            throw new NoDataException("Не найден рейтинг с таким номером");
-    }
-
     private void updateFilmUsersLikes(Film film) {
         deleteFromFilmLikes(film);
         String sqlQuery = "INSERT INTO FILM_LIKES (ID_FILM, ID_USER) VALUES (?, ?)";
@@ -185,7 +144,7 @@ public class FilmDbStorage implements FilmStorage {
         Integer duration = rs.getInt("DURATION");
         Set<Integer> likes = getLikes(filmId);
         List<Genre> genre = getGenres(filmId);
-        MPA mpa = getRatingById(rs.getInt("ID_RATING"));
+        MPA mpa = getMPA(rs.getInt("ID_RATING"));
         return new Film(filmId, name, description, releaseDate, duration, likes, genre, mpa);
     }
 
@@ -217,15 +176,24 @@ public class FilmDbStorage implements FilmStorage {
     private List<Genre> getGenres(Integer filmId) {
         SqlRowSet genreRows =
                 jdbcTemplate.queryForRowSet("SELECT g.ID, g.NAME FROM FILM_GENRE AS f " +
-                        "LEFT JOIN GENRE AS g ON g.ID = f.ID_GENRE" +
+                        "JOIN GENRE AS g ON g.ID = f.ID_GENRE" +
                         " WHERE ID_FILM = ?" +
-                        "ORDER BY g.ID", filmId);
+                        " ORDER BY g.ID", filmId);
         List<Genre> genres = new ArrayList<>();
         while (genreRows.next()) {
             Genre genre = makeGenre(genreRows);
             genres.add(genre);
         }
         return genres;
+    }
+
+    private MPA getMPA(Integer id) {
+        SqlRowSet ratingRows =
+                jdbcTemplate.queryForRowSet("SELECT * FROM RATING WHERE ID = ?", id);
+        if (ratingRows.next()) {
+            return makeMPA(ratingRows);
+        } else
+            throw new NoDataException("Не найден рейтинг с таким номером");
     }
 
     private Set<Integer> getGenreIdList(List<Genre> genreList) {

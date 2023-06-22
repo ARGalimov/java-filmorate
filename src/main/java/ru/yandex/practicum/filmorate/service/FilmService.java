@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.*;
@@ -19,7 +17,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 
@@ -72,21 +70,5 @@ public class FilmService {
             count = MAX_QUANTITY_POPULAR_FILMS;
         }
         return popularFilms.stream().limit(count).collect(Collectors.toSet());
-    }
-
-    public List<Genre> getAllGenres() {
-        return filmStorage.getAllGenres();
-    }
-
-    public Genre getGenreById(Integer id) {
-        return filmStorage.getGenreById(id);
-    }
-
-    public List<MPA> getAllRatings() {
-        return filmStorage.getAllRatings();
-    }
-
-    public MPA getRatingById(Integer id) {
-        return filmStorage.getRatingById(id);
     }
 }
