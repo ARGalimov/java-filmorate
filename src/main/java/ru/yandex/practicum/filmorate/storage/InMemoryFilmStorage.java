@@ -20,16 +20,28 @@ public class InMemoryFilmStorage implements FilmStorage {
     private Integer id = 0;
 
     @Override
-    public void create(Film film) throws ValidationException {
+    public Film create(Film film) throws ValidationException {
         validateFilmCreation(films, film);
         film.setId(++id);
         films.put(film.getId(), film);
+        return film;
     }
 
     @Override
-    public void update(Film film) throws ValidationException, NoDataException {
+    public Film update(Film film) throws ValidationException, NoDataException {
         validateFilmUpdate(films, film);
         films.put(film.getId(), film);
+        return film;
+    }
+
+    @Override
+    public void delete(Film film) {
+        if (films.containsKey(film.getId())) {
+            films.remove(film.getId());
+            log.debug("Фильм {} удалён", film);
+        } else {
+            throw new NoDataException("Фильм не существует");
+        }
     }
 
     @Override

@@ -8,12 +8,13 @@ import java.util.List;
 
 public interface FilmStorage {
 
-    void create(Film film) throws ValidationException;
+    Film create(Film film) throws ValidationException;
 
-    void update(Film film) throws ValidationException, NoDataException;
+    Film update(Film film) throws ValidationException, NoDataException;
+
+    void delete(Film film);
 
     List<Film> getFilmList();
 
     Film getById(Integer id) throws NoDataException;
-
 }

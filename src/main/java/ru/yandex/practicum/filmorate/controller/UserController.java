@@ -23,16 +23,12 @@ public class UserController {
 
     @PostMapping
     public User create(@RequestBody User user) throws ValidationException {
-        userService.create(user);
-        log.info("Пользователь создан");
-        return user;
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody User user) throws ValidationException, NoDataException {
-        userService.update(user);
-        log.info("Пользователь обновлен");
-        return user;
+        return userService.update(user);
     }
 
     @GetMapping
@@ -48,21 +44,21 @@ public class UserController {
 
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable(name = "id") Integer id, @PathVariable(name = "friendId") Integer friendId)
+    public void addFriend(@PathVariable(name = "id") Integer id, @PathVariable(name = "friendId") Integer friendId)
             throws NoDataException {
-        return userService.addFriend(id, friendId);
+        userService.addFriend(id, friendId);
     }
 
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User deleteFriend(@PathVariable(name = "id") Integer id, @PathVariable(name = "friendId") Integer friendId)
+    public void deleteFriend(@PathVariable(name = "id") Integer id, @PathVariable(name = "friendId") Integer friendId)
             throws NoDataException {
-        return userService.deleteFriend(id, friendId);
+        userService.deleteFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable(name = "id") Integer id) throws NoDataException {
-        return userService.getFriends(id);
+        return userService.getFriends(userService.getById(id).getFriends());
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
